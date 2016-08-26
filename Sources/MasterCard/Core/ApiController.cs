@@ -28,6 +28,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Text;
 using System.Net;
 using System.Web;
@@ -96,10 +97,11 @@ namespace MasterCard.Core
 
         public dynamic ExecuteDynamic(string action, string resourcePath, dynamic request)
         {
-            var sample = request.GetType().GetProperties() as System.Reflection.PropertyInfo[];
-            var parameters = sample.ToDictionary(x => x.Name, x => x.GetValue(request));
+            var properties = request.GetType().GetProperties() as System.Reflection.PropertyInfo[];
+            var parameters = properties.ToDictionary(x => x.Name, x => x.GetValue(request));
             Uri uri = getURL(action, resourcePath, parameters);
-            request = getRequest(uri, action, new Parameters() {}, new Parameters(), null);
+            var interceptor = ApiConfig.GetCryptographyInterceptor(uri.AbsolutePath);
+            request = getRequest(uri, action, new Parameters() {}, new Parameters(), interceptor);
             var response = restClient.Execute(request);
             return JsonConvert.DeserializeObject<dynamic>(response.Content);
         }

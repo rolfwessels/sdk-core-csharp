@@ -56,13 +56,11 @@ namespace TestMasterCard
 
 
         [Test]
-        public void method_GiventestingFor_Shouldresult()
+        public void QueryDynamic_GivenDynamicRequest_ShouldFetchDataAndReturnAsDynamic()
         {
             // arrange
-            Setup();
+            dynamic request = new { CurrentRow = 1, Offset = 25 };
             // action
-            dynamic request = new {CurrentRow = 1, Offset = 25};
-
             var response = Parameters.QueryDynamic(request);
             // assert
             Assert.That("NO", Is.EqualTo((string)response.ParameterList.ParameterArray.Parameter[1].Ecomm).IgnoreCase);

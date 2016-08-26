@@ -92,8 +92,9 @@ namespace TestMasterCard
 
         public static dynamic QueryDynamic(dynamic request)
         {
-            ApiController apiController = new ApiController(new Parameters().GetApiVersion());
-            return apiController.ExecuteDynamic("query", request);
+            var parameters = new Parameters();
+            ApiController apiController = new ApiController(parameters.GetApiVersion());
+            return apiController.ExecuteDynamic("query",parameters.GetResourcePath("query"), request);
         }
     }
 }
