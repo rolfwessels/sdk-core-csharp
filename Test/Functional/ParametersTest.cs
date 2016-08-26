@@ -26,75 +26,87 @@
  */
 
 
-
 using System;
-using System.Collections.Generic;
-using NUnit.Framework;
-
-
 using MasterCard.Core;
-using MasterCard.Core.Exceptions;
 using MasterCard.Core.Model;
 using MasterCard.Core.Security.OAuth;
-
+using Newtonsoft.Json;
+using NUnit.Framework;
 
 namespace TestMasterCard
 {
+    [TestFixture]
+    public class ParametersTest
+    {
+        #region Setup/Teardown
+
+        [SetUp]
+        public void Setup()
+        {
+            var currentPath = Util.GetCurrenyAssemblyPath();
+            var authentication =
+                new OAuthAuthentication(
+                    "gVaoFbo86jmTfOB4NUyGKaAchVEU8ZVPalHQRLTxeaf750b6!414b543630362f426b4f6636415a5973656c33735661383d",
+                    currentPath + "\\Test\\prod_key.p12", "alias", "password");
+            ApiConfig.setAuthentication(authentication);
+            ApiConfig.setSandbox(true);
+        }
+
+        #endregion
 
 
-	[TestFixture ()]
-	public class ParametersTest
-	{
+        [Test]
+        public void method_GiventestingFor_Shouldresult()
+        {
+            // arrange
+            Setup();
+            // action
+            dynamic request = new {CurrentRow = 1, Offset = 25};
 
-		[SetUp]
-		public void setup ()
-		{
-            var currentPath = MasterCard.Core.Util.GetCurrenyAssemblyPath();
-            var authentication = new OAuthAuthentication("gVaoFbo86jmTfOB4NUyGKaAchVEU8ZVPalHQRLTxeaf750b6!414b543630362f426b4f6636415a5973656c33735661383d", currentPath + "\\Test\\prod_key.p12", "alias", "password");
-            ApiConfig.setAuthentication (authentication);
-			ApiConfig.setSandbox (true);
-		}
+            var response = Parameters.QueryDynamic(request);
+            // assert
+            Assert.That("NO", Is.EqualTo((string)response.ParameterList.ParameterArray.Parameter[1].Ecomm).IgnoreCase);
+            Assert.That("Quarterly", Is.EqualTo((string)response.ParameterList.ParameterArray.Parameter[1].Period).IgnoreCase);
+            Assert.That("NO", Is.EqualTo((string)response.ParameterList.ParameterArray.Parameter[2].Ecomm).IgnoreCase);
+            Assert.That("NO", Is.EqualTo((string)response.ParameterList.ParameterArray.Parameter[0].Ecomm).IgnoreCase);
+            Assert.That("U.S. Natural and Organic Grocery Stores", Is.EqualTo((string)response.ParameterList.ParameterArray.Parameter[0].Sector).IgnoreCase);
+            Assert.That("U.S. Natural and Organic Grocery Stores", Is.EqualTo((string)response.ParameterList.ParameterArray.Parameter[1].Sector).IgnoreCase);
+            Assert.That("U.S. Natural and Organic Grocery Stores", Is.EqualTo((string)response.ParameterList.ParameterArray.Parameter[2].Sector).IgnoreCase);
+            Assert.That("Monthly", Is.EqualTo((string)response.ParameterList.ParameterArray.Parameter[0].Period).IgnoreCase);
+            Assert.That("Success", Is.EqualTo((string)response.ParameterList.Message).IgnoreCase);
+            Assert.That("3", Is.EqualTo((string)response.ParameterList.Count.ToString()).IgnoreCase);
+            Assert.That("US", Is.EqualTo((string)response.ParameterList.ParameterArray.Parameter[0].Country).IgnoreCase);
+            Assert.That("Weekly", Is.EqualTo((string)response.ParameterList.ParameterArray.Parameter[2].Period).IgnoreCase);
+            Assert.That("US", Is.EqualTo((string)response.ParameterList.ParameterArray.Parameter[1].Country).IgnoreCase);
+            Assert.That("US", Is.EqualTo((string)response.ParameterList.ParameterArray.Parameter[2].Country).IgnoreCase);
+        }
 
-        
-            
-            
-            
-            
-            
-            
-                        
 
-        [Test ()]
+
+        [Test]
         public void example_parameters_Test()
         {
-            RequestMap parameters = new RequestMap();
-            
-            parameters.Set ("CurrentRow", "1");
-            parameters.Set ("Offset", "25");
-            
-            
+            var parameters = new RequestMap();
 
-            Parameters response = Parameters.Query(parameters);
+            parameters.Set("CurrentRow", "1");
+            parameters.Set("Offset", "25");
+
+
+            var response = Parameters.Query(parameters);
             Assert.That("NO", Is.EqualTo(response["ParameterList.ParameterArray.Parameter[1].Ecomm"]).IgnoreCase);
             Assert.That("Quarterly", Is.EqualTo(response["ParameterList.ParameterArray.Parameter[1].Period"]).IgnoreCase);
             Assert.That("NO", Is.EqualTo(response["ParameterList.ParameterArray.Parameter[2].Ecomm"]).IgnoreCase);
             Assert.That("NO", Is.EqualTo(response["ParameterList.ParameterArray.Parameter[0].Ecomm"]).IgnoreCase);
-            Assert.That("U.S. Natural and Organic Grocery Stores", Is.EqualTo(response["ParameterList.ParameterArray.Parameter[0].Sector"]).IgnoreCase);
-            Assert.That("U.S. Natural and Organic Grocery Stores", Is.EqualTo(response["ParameterList.ParameterArray.Parameter[1].Sector"]).IgnoreCase);
-            Assert.That("U.S. Natural and Organic Grocery Stores", Is.EqualTo(response["ParameterList.ParameterArray.Parameter[2].Sector"]).IgnoreCase);
+            Assert.That("U.S. Natural and Organic Grocery Stores",Is.EqualTo(response["ParameterList.ParameterArray.Parameter[0].Sector"]).IgnoreCase);
+            Assert.That("U.S. Natural and Organic Grocery Stores",Is.EqualTo(response["ParameterList.ParameterArray.Parameter[1].Sector"]).IgnoreCase);
+            Assert.That("U.S. Natural and Organic Grocery Stores",Is.EqualTo(response["ParameterList.ParameterArray.Parameter[2].Sector"]).IgnoreCase);
             Assert.That("Monthly", Is.EqualTo(response["ParameterList.ParameterArray.Parameter[0].Period"]).IgnoreCase);
             Assert.That("Success", Is.EqualTo(response["ParameterList.Message"]).IgnoreCase);
-			Assert.That("3", Is.EqualTo(response["ParameterList.Count"].ToString()).IgnoreCase);
+            Assert.That("3", Is.EqualTo(response["ParameterList.Count"].ToString()).IgnoreCase);
             Assert.That("US", Is.EqualTo(response["ParameterList.ParameterArray.Parameter[0].Country"]).IgnoreCase);
             Assert.That("Weekly", Is.EqualTo(response["ParameterList.ParameterArray.Parameter[2].Period"]).IgnoreCase);
             Assert.That("US", Is.EqualTo(response["ParameterList.ParameterArray.Parameter[1].Country"]).IgnoreCase);
             Assert.That("US", Is.EqualTo(response["ParameterList.ParameterArray.Parameter[2].Country"]).IgnoreCase);
-            
-
         }
-        
-            
-        
     }
 }
-

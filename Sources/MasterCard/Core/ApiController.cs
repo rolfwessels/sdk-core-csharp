@@ -38,6 +38,8 @@ using log4net.Config;
 using System.Linq;
 using System.IO;
 using MasterCard.Core.Security;
+using Newtonsoft.Json;
+using TestMasterCard;
 
 namespace MasterCard.Core
 {
@@ -92,15 +94,24 @@ namespace MasterCard.Core
 			this.restClient = restClient;
 		}
 
+        public dynamic ExecuteDynamic(string action, string resourcePath, dynamic request)
+        {
+            var sample = request.GetType().GetProperties() as System.Reflection.PropertyInfo[];
+            var parameters = sample.ToDictionary(x => x.Name, x => x.GetValue(request));
+            Uri uri = getURL(action, resourcePath, parameters);
+            request = getRequest(uri, action, new Parameters() {}, new Parameters(), null);
+            var response = restClient.Execute(request);
+            return JsonConvert.DeserializeObject<dynamic>(response.Content);
+        }
 
-		/// <summary>
-		/// Execute the specified action, resourcePath and baseObject.
-		/// </summary>
-		/// <param name="action">Action.</param>
-		/// <param name="resourcePath">Resource path.</param>
-		/// <param name="requestMap">Request Map.</param>
-		/// <param name="headerList">Header List.</param>
-		public virtual IDictionary<String, Object> execute (string action, string resourcePath, BaseObject requestMap, List<string> headerList)
+        /// <summary>
+        /// Execute the specified action, resourcePath and baseObject.
+        /// </summary>
+        /// <param name="action">Action.</param>
+        /// <param name="resourcePath">Resource path.</param>
+        /// <param name="requestMap">Request Map.</param>
+        /// <param name="headerList">Header List.</param>
+        public virtual IDictionary<String, Object> execute (string action, string resourcePath, BaseObject requestMap, List<string> headerList)
 		{
 			IRestResponse response;
 			IRestRequest request;
@@ -407,7 +418,7 @@ namespace MasterCard.Core
 		}
 
 
-
+	  
 	}
 
 

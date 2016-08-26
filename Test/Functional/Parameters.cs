@@ -37,6 +37,8 @@ using MasterCard.Core.Security;
 
 namespace TestMasterCard
 {
+    
+
     public class Parameters : BaseObject
     {
 
@@ -70,11 +72,7 @@ namespace TestMasterCard
             return "0.0.1";
         }
 
-
-
-
-
-
+        
 
         /// <summary>
         /// Query and Returns one object of type <code>Parameters</code>
@@ -91,8 +89,12 @@ namespace TestMasterCard
         {
             return (Parameters) BaseObject.queryObject(new Parameters(parameters));
         }
-        
-        
+
+        public static dynamic QueryDynamic(dynamic request)
+        {
+            ApiController apiController = new ApiController(new Parameters().GetApiVersion());
+            return apiController.ExecuteDynamic("query", request);
+        }
     }
 }
 
